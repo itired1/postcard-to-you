@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>поздравление для Орхана</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
+            position: relative;
+        }
+
+        /* Конверт */
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #111;
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            z-index: 20;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #222;
+            transform-origin: top;
+            transition: all 0.5s ease;
+        }
+
+        .envelope.open:before {
+            transform: rotateX(180deg);
+        }
+
+        .envelope .seal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: #500;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ccc;
+            font-size: 24px;
+            box-shadow: 0 0 10px #f00;
+        }
+
+        /* Открытка */
+        .card {
+            position: absolute;
+            width: 80%;
+            max-width: 600px;
+            padding: 40px;
+            background: #111;
+            border: 3px solid #300;
+            box-shadow: 0 0 30px #f00;
+            text-align: center;
+            color: #c00;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.8s ease;
+            z-index: 10;
+        }
+
+        .card.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #f00;
+            animation: flicker 3s infinite alternate;
+        }
+
+        p {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin: 15px 0;
+            text-shadow: 0 0 5px #f00;
+        }
+
+        .signature {
+            margin-top: 30px;
+            font-style: italic;
+            font-size: 1.2em;
+        }
+
+        /* Анимации */
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 0 0 10px #f00, 0 0 20px #f00;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+            }
+        }
+
+        /* Летучие мыши */
+        .bat {
+            position: absolute;
+            color: #333;
+            font-size: 24px;
+            z-index: 1;
+            animation: fly linear infinite;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        @keyframes fly {
+            0% {
+                transform: translateX(-100px) rotate(0deg);
+            }
+            100% {
+                transform: translateX(calc(100vw + 100px)) rotate(360deg);
+            }
+        }
+
+        /* Капли крови */
+        .blood-drop {
+            position: absolute;
+            width: 5px;
+            height: 10px;
+            background: #f00;
+            border-radius: 50% 50% 50% 50%/60% 60% 40% 40%;
+            animation: drop 3s linear infinite;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        @keyframes drop {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Паутина */
+        .web {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M0,0 L100,100 M100,0 L0,100 M50,0 L50,100 M0,50 L100,50" stroke="rgba(80,0,0,0.3)" stroke-width="0.5"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Молнии */
+        .lightning {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .lightning-bolt {
+            position: absolute;
+            width: 4px;
+            height: 0;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.7);
+            transform: rotate(20deg);
+            opacity: 0;
+        }
+
+        /* Аудио-контроллер (скрытый) */
+        #audioPlayer {
+            position: absolute;
+            opacity: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="web"></div>
+    <div class="lightning" id="lightningContainer"></div>
+
+    <!-- Аудио (готическая музыка) -->
+    <audio id="audioPlayer" loop>
+        <source src="они идут кто там Азербайджанцы.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <!-- Конверт -->
+    <div class="envelope" id="envelope">
+        <div class="seal">💀</div>
+    </div>
+
+    <!-- Открытка -->
+    <div class="card" id="card">
+        <h1>ОРХАН</h1>
+        <p>Когда ночь поглощает последние лучи света,</p>
+        <p>И тени начинают шептать твоё имя,</p>
+        <p>Они склоняют колени перед твоим троном.</p>
+        <br>
+        <p>Пусть YEAT будет твоим союзником,</p>
+        <p>А ветер приносит шёпот забытых денег.</p>
+        <p>С Днём Рождения, Владыка казино и денег</p>
+        <div class="signature">...да денег нет и я сплю вообще щяс</div>
+    </div>
+
+    <script>
+        // Создаем элементы анимации
+        function createBats() {
+            const batsCount = 7;
+            for (let i = 0; i < batsCount; i++) {
+                const bat = document.createElement('div');
+                bat.className = 'bat';
+                bat.innerHTML = '🦇';
+                bat.style.left = '-100px';
+                bat.style.top = Math.random() * 100 + 'vh';
+                bat.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                bat.style.animationDelay = (Math.random() * 5) + 's';
+                document.body.appendChild(bat);
+            }
+        }
+
+        function createBlood() {
+            const dropsCount = 20;
+            for (let i = 0; i < dropsCount; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'blood-drop';
+                drop.style.left = Math.random() * 100 + 'vw';
+                drop.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                drop.style.animationDelay = (Math.random() * 5) + 's';
+                document.body.appendChild(drop);
+            }
+        }
+
+        // Молнии
+        function createLightning() {
+            const container = document.getElementById('lightningContainer');
+            const bolt = document.createElement('div');
+            bolt.className = 'lightning-bolt';
+            
+            // Случайное положение
+            bolt.style.left = Math.random() * 100 + 'vw';
+            bolt.style.top = '-100px';
+            bolt.style.height = Math.random() * 200 + 100 + 'px';
+            
+            container.appendChild(bolt);
+            
+            // Анимация вспышки
+            let opacity = 0;
+            let growing = true;
+            const flash = setInterval(() => {
+                if (growing) {
+                    opacity += 0.1;
+                    if (opacity >= 0.8) growing = false;
+                } else {
+                    opacity -= 0.1;
+                    if (opacity <= 0) {
+                        clearInterval(flash);
+                        bolt.remove();
+                    }
+                }
+                bolt.style.opacity = opacity;
+            }, 30);
+        }
+
+        // Случайные молнии
+        function startLightning() {
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    createLightning();
+                    // Вторая молния с задержкой (для эффекта эха)
+                    if (Math.random() > 0.5) {
+                        setTimeout(createLightning, 200);
+                    }
+                }
+            }, 3000);
+        }
+
+        // Открытие конверта
+        const envelope = document.getElementById('envelope');
+        const card = document.getElementById('card');
+        const audioPlayer = document.getElementById('audioPlayer');
+
+        // Предварительная загрузка музыки
+        audioPlayer.preload = "auto";
+        
+        envelope.addEventListener('click', function() {
+            this.classList.add('open');
+            setTimeout(() => {
+                this.style.opacity = '0';
+                card.classList.add('show');
+                // Дополнительные эффекты при открытии
+                document.body.style.background = 'radial-gradient(circle, #000000 0%, #1a0000 100%)';
+                createBats();
+                createBlood();
+                startLightning();
+                
+                // Включаем музыку (тихо)
+                audioPlayer.volume = 0.3; // Громкость 30%
+                const playPromise = audioPlayer.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        // Автовоспроизведение было заблокировано
+                        console.log("Автовоспроизведение заблокировано, нужно взаимодействие пользователя");
+                        // Показываем кнопку для ручного запуска музыки
+                        const playButton = document.createElement('button');
+                        playButton.textContent = 'Включить музыку';
+                        playButton.style.position = 'fixed';
+                        playButton.style.bottom = '20px';
+                        playButton.style.left = '50%';
+                        playButton.style.transform = 'translateX(-50%)';
+                        playButton.style.zIndex = '100';
+                        playButton.style.padding = '10px 20px';
+                        playButton.style.background = '#500';
+                        playButton.style.color = 'white';
+                        playButton.style.border = 'none';
+                        playButton.style.borderRadius = '5px';
+                        playButton.style.cursor = 'pointer';
+                        playButton.addEventListener('click', () => {
+                            audioPlayer.play();
+                            playButton.remove();
+                        });
+                        document.body.appendChild(playButton);
+                    });
+                }
+            }, 500);
+        });
+
+        // Запускаем редкие молнии до открытия
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                createLightning();
+            }
+        }, 8000);
+    </script>
+</body>
+</html>
